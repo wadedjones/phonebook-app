@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -14,38 +16,10 @@ morgan.token('content', function getContent (req) {
 
 app.use(morgan(':method :url :status :response-time :content'))
 
-let phonebook = [
-    { 
-        "id": 1,
-        "name": "Arto Hellas", 
-        "number": "040-123456"
-      },
-      { 
-        "id": 2,
-        "name": "Ada Lovelace", 
-        "number": "39-44-5323523"
-      },
-      { 
-        "id": 3,
-        "name": "Dan Abramov", 
-        "number": "12-43-234345"
-      },
-      { 
-        "id": 4,
-        "name": "Mary Poppendieck", 
-        "number": "39-23-6423122"
-      }
-]
-
-const generateId = () => {
-    const maxId = phonebook.length > 0
-        ? Math.max(...phonebook.map(p => p.id))
-        : 0
-    return maxId + 1
-}
-
 app.get('/api/persons', (request, response) => {
-    response.json(phonebook)
+    Person.find({}).then(people => {
+        response.json(people)
+    })
 })
 
 app.get('/info', (request, response) => {
@@ -57,38 +31,36 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = phonebook.find(p => p.id === id)
-    if (person) {
+    Person.findById(request.params.id).then(person => {
         response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    })
 })
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    const duplicatePerson = phonebook.find(p => p.name === body.name)
-    console.log(body)
+    //const duplicatePerson = phonebook.find(p => p.name === body.name)
+    //console.log(body)
+
     if (!body.name || !body.number) {
         return response.status(400).json({
             error: 'content missing'
         })
     }
+    /*
     if (duplicatePerson) {
         return response.status(400).json({
             error: 'name must be unique'
         })
     }
-    
+    */
 
-    const person = {
+    const person = new Person ({
         name: body.name,
         number: body.number,
-        id: generateId()
-    }
-    phonebook = phonebook.concat(person)
-    response.json(person)
+    })
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
