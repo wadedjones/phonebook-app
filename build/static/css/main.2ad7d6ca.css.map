@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.2ad7d6ca.css","mappings":"AAAA,cACI,wBAAmC,CAEnC,YAAa,CACb,iBAAkB,CAFlB,aAAsB,CAGtB,YACJ","sources":["index.css"],"sourcesContent":[".notification {\n    background-color:rgb(185, 185, 185);\n    color: rgb(91, 91, 91);\n    border: solid;\n    border-radius: 5px;\n    padding: 10px;\n}"],"names":[],"sourceRoot":""}
